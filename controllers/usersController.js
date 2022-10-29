@@ -28,13 +28,7 @@ const login = (req, res, next) => {
     .then((user) => {
       sendTokenCookie(res, user);
     })
-    .catch((err) => {
-      if (err.name === 'ValidationError') {
-        next(new BadRequestError(err.message));
-      } else {
-        next(err);
-      }
-    });
+    .catch(next);
 };
 
 const logout = (_, res) => {
