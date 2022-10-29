@@ -3,6 +3,7 @@ const { login, register, logout } = require('../controllers/usersController');
 const NotFoundError = require('../errors/notFoundError');
 const moviesRouter = require('./moviesRouter');
 const usersRouter = require('./usersRouter');
+const auth = require('../middlewares/auth');
 
 router.get('/crash', () => {
   throw new Error('Я УПАЛ!');
@@ -10,6 +11,8 @@ router.get('/crash', () => {
 
 router.post('/signin', login);
 router.post('/signup', register);
+
+router.use(auth); // защита роутов авторизацией
 
 router.use('/users', usersRouter);
 router.use('/movies', moviesRouter);

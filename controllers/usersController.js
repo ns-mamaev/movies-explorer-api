@@ -42,6 +42,10 @@ const getOwnProfile = () => {};
 
 const updateOwnProfile = () => {};
 
+const createTokenById = (id) => {
+
+}
+
 module.exports = {
   login,
   logout,
