@@ -24,21 +24,27 @@ const createMovie = (req, res, next) => {
     movieId,
   } = req.body;
 
-  Movie.create({
-    country,
-    director,
-    duration,
-    year,
-    description,
-    image,
-    trailerLink,
-    nameRU,
-    nameEN,
-    thumbnail,
-    movieId,
-    owner: req.user._id,
-  })
-    .then((movie) => res.status(201).send(movie))
+  Movie.findOne({ movieId })
+    .then((movie) => {
+      if (movie) {
+        throw new ForbiddenError('Фильм с данным id уже добавлен в базу')
+      }
+      return Movie.create({
+        country,
+        director,
+        duration,
+        year,
+        description,
+        image,
+        trailerLink,
+        nameRU,
+        nameEN,
+        thumbnail,
+        movieId,
+        owner: req.user._id,
+      })
+        .then((newMovie) => res.status(201).send(newMovie));
+    })
     .catch((err) => {
       if (err.name === 'ValidationError') {
         next(new BadRequestError(err.message));
