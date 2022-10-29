@@ -37,7 +37,9 @@ const login = (req, res, next) => {
     });
 };
 
-const logout = () => {};
+const logout = (_, res) => {
+  res.clearCookie('token').send({ message: 'Вы вышли из профиля' });
+};
 
 const register = async (req, res, next) => {
   const { email, password, name } = req.body;

@@ -17,6 +17,7 @@ router.use(auth); // защита роутов авторизацией
 router.use('/users', usersRouter);
 router.use('/movies', moviesRouter);
 router.get('/signout', logout);
+
 router.use(() => {
   throw new NotFoundError('Ресурс не найден. Проверьте URL и метод запроса');
 });
