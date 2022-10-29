@@ -2,44 +2,44 @@ const db = require('mongoose');
 const validator = require('validator');
 
 const urlValidator = {
-  validator: (v) => validator.isURL(v, { protocols: ['http', 'https'], require_protocol: true }),
+  validator: (v) => validator.isURL(v, { protocols: ['http', 'https'], required_protocol: true }),
   message: ({ value }) => `${value} - некоректный адрес URL. Ожидается адрес в формате: http(s)://(www.)site.com`,
 };
 
 const movieSchema = new db.Schema({
   country: {
     type: String,
-    require: true,
+    required: true,
   },
   director: {
     type: String,
-    require: true,
+    required: true,
   },
   duration: {
     type: Number,
-    require: true,
+    required: true,
   },
   year: {
     type: String,
-    require: true,
+    required: true,
   },
   description: {
     type: String,
-    require: true,
+    required: true,
   },
   image: {
     type: String,
-    require: true,
+    required: true,
     validate: urlValidator,
   },
   trailerLink: {
     type: String,
-    require: true,
+    required: true,
     validate: urlValidator,
   },
   thumbnail: {
     type: String,
-    require: true,
+    required: true,
     validate: urlValidator,
   },
   owner: {
@@ -49,15 +49,15 @@ const movieSchema = new db.Schema({
   },
   movieId: {
     type: Number,
-    required: true,
+    requiredd: true,
   },
   nameRU: {
     type: String,
-    require: true,
+    required: true,
   },
   nameEN: {
     type: String,
-    require: true,
+    required: true,
   },
 });
 
