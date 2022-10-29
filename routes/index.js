@@ -4,13 +4,14 @@ const NotFoundError = require('../errors/notFoundError');
 const moviesRouter = require('./moviesRouter');
 const usersRouter = require('./usersRouter');
 const auth = require('../middlewares/auth');
+const { validateLoginData, validateRegisterData } = require('../validators/userValidators');
 
 router.get('/crash', () => {
   throw new Error('Я УПАЛ!');
 });
 
-router.post('/signin', login);
-router.post('/signup', register);
+router.post('/signin', validateLoginData, login);
+router.post('/signup', validateRegisterData, register);
 
 router.use(auth); // защита роутов авторизацией
 

@@ -27,7 +27,7 @@ const createMovie = (req, res, next) => {
   Movie.findOne({ movieId })
     .then((movie) => {
       if (movie) {
-        throw new ForbiddenError('Фильм с данным id уже добавлен в базу')
+        throw new ForbiddenError('Фильм с данным id уже добавлен в базу');
       }
       return Movie.create({
         country,
