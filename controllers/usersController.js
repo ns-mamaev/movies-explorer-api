@@ -59,9 +59,31 @@ const register = async (req, res, next) => {
   }
 };
 
-const getOwnProfile = () => {};
+const getOwnProfile = (req, res, next) => {
+  const { _id } = req.user;
+  User.findById(_id)
+    .then((user) => res.send(user))
+    .catch(next);
+};
 
-const updateOwnProfile = () => {};
+const updateOwnProfile = (req, res, next) => {
+  User.findByIdAndUpdate(
+    req.user._id,
+    { name: req.body.name },
+    {
+      new: true,
+      runValidators: true,
+    },
+  )
+    .then((user) => res.send(user))
+    .catch((err) => {
+      if (err.name === 'ValidationError') {
+        next(new BadRequestError(err.message));
+      } else {
+        next(err);
+      }
+    });
+};
 
 module.exports = {
   login,
