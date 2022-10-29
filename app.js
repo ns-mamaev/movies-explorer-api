@@ -5,6 +5,7 @@ const cookieParser = require('cookie-parser');
 const limitter = require('express-rate-limit');
 const helmet = require('helmet');
 const { errors: validationErrorsHandler } = require('celebrate');
+const cors = require('./middlewares/cors');
 const router = require('./routes/index');
 const errorsHandler = require('./middlewares/errorsHandler');
 const { requestLogger, errorLogger } = require('./middlewares/logger');
@@ -12,8 +13,8 @@ const { requestLogger, errorLogger } = require('./middlewares/logger');
 const {
   PORT = 3000,
   NODE_ENV,
-  REQUESTS_WINDOW_MS,
-  MAX_REQUESTS_NUMBER,
+  REQUESTS_WINDOW_MS = 300000,
+  MAX_REQUESTS_NUMBER = 100,
 } = process.env;
 
 const app = express();
@@ -25,7 +26,9 @@ app.use(limitter({
   max: MAX_REQUESTS_NUMBER,
 }));
 app.use(helmet());
+
 app.use(requestLogger);
+app.use(cors);
 app.use(router);
 
 app.use(errorLogger);

@@ -6,7 +6,7 @@ const ConflictError = require('../errors/conflictError');
 const BadRequestError = require('../errors/badRequestError');
 const { getJWTSecretKey } = require('../utills/utills');
 
-const { COOKIE_MAX_AGE } = process.env;
+const { COOKIE_MAX_AGE = 86400000 } = process.env;
 
 const createTokenById = (id) => jwt.sign({ _id: id }, getJWTSecretKey(), { expiresIn: '7d' });
 
@@ -17,7 +17,7 @@ const sendTokenCookie = (res, newUser) => {
     .cookie('token', token, {
       maxAge: COOKIE_MAX_AGE,
       httpOnly: true,
-      sameSite: false,
+      sameSite: true,
     })
     .send(newUser);
 };
