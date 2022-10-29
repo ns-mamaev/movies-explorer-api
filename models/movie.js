@@ -16,7 +16,7 @@ const movieSchema = new db.Schema({
     require: true,
   },
   duration: {
-    type: String,
+    type: Number,
     require: true,
   },
   year: {
@@ -48,7 +48,7 @@ const movieSchema = new db.Schema({
     required: true,
   },
   movieId: {
-    type: db.Schema.Types.ObjectId,
+    type: Number,
     required: true,
   },
   nameRU: {
