@@ -1,10 +1,12 @@
 const db = require('mongoose');
+const bcrypt = require('bcrypt');
 const validator = require('validator');
+const UnauthorizedError = require('../errors/unauthorizedError');
 
 const userSchema = new db.Schema({
   name: {
     type: String,
-    default: 'Имя не задано',
+    required: true,
     minlength: [2, 'поле должно содержать минимум 2 символа'],
     maxlength: [30, 'максимальная длина поля 30 символов'],
   },
@@ -24,5 +26,21 @@ const userSchema = new db.Schema({
     select: false,
   },
 }, { toObject: { useProjection: true }, toJSON: { useProjection: true } });
+
+userSchema.statics.findUserByCredentials = function (email, password) {
+  return this.findOne({ email }).select('+password')
+    .then((user) => {
+      if (!user) {
+        return Promise.reject(new UnauthorizedError('Неправильная почта или пароль'));
+      }
+      return bcrypt.compare(password, user.password)
+        .then((matched) => {
+          if (!matched) {
+            return Promise.reject(new UnauthorizedError('Неправильная почта или пароль'));
+          }
+          return user;
+        });
+    });
+};
 
 module.exports = db.model('user', userSchema);
