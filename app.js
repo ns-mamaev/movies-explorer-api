@@ -13,10 +13,11 @@ const limitter = require('./middlewares/limitter');
 const {
   PORT = 3000,
   NODE_ENV,
+  DB_PATH,
 } = process.env;
 
 const app = express();
-db.connect('mongodb://localhost:27017/bitfilmsdb');
+db.connect(NODE_ENV === 'production' ? DB_PATH : 'mongodb://localhost:27017/moviesdb');
 app.use(limitter);
 app.use(express.json());
 app.use(cookieParser());
