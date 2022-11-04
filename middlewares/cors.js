@@ -1,7 +1,6 @@
-const allowedCors = [
-  'https://localhost:3000',
-  'http://localhost:3000',
-];
+const { ALOWED_CORS = 'https://localhost:3000;http://localhost:3000' } = process.env;
+
+const allowedCors = ALOWED_CORS.split(';');
 
 const DEFAULT_ALLOWED_METHODS = 'GET,HEAD,PATCH,POST,DELETE';
 
