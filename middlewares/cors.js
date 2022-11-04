@@ -1,9 +1,14 @@
 require('dotenv').config();
 
-const { ALOWED_CORS = 'https://localhost:3000;http://localhost:3000' } = process.env;
+const { NODE_ENV, ALLOWED_CORS } = process.env;
 
-const allowedCors = ALOWED_CORS.split(';');
+const allowedCors = NODE_ENV === 'production'
+  ? ALLOWED_CORS.split(';')
+  : ['https://localhost:3000', 'http://localhost:3000'];
+
 const DEFAULT_ALLOWED_METHODS = 'GET,HEAD,PATCH,POST,DELETE';
+
+console.log(allowedCors);
 
 // eslint-disable-next-line consistent-return
 module.exports = (req, res, next) => {
