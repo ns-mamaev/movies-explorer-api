@@ -65,7 +65,7 @@ const updateOwnProfile = async (req, res, next) => {
   try {
     const doubleUser = await User.findOne({ email });
     // если _id не равны - значит попытка использовать email занятый другим пользователем
-    if (doubleUser?._id !== req.user._id) {
+    if (doubleUser && doubleUser._id.toString() !== req.user._id) {
       throw new ConflictError(DOUBLE_EMAIL_MESSAGE);
     }
     const updatedUser = await User.findByIdAndUpdate(
