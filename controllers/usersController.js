@@ -1,17 +1,18 @@
-require('dotenv').config();
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 const User = require('../models/user');
 const ConflictError = require('../errors/conflictError');
 const BadRequestError = require('../errors/badRequestError');
-const { getJWTSecretKey } = require('../utills/utills');
+const {
+  LOGOUT_MESSAGE,
+  DOUBLE_EMAIL_MESSAGE,
+} = require('../utills/constants');
+const { COOKIE_MAX_AGE, JWT_SECRET } = require('../server.config');
 
-const { COOKIE_MAX_AGE = 86400000 } = process.env;
+const createTokenById = (id) => jwt.sign({ _id: id }, JWT_SECRET, { expiresIn: '7d' });
 
-const createTokenById = (id) => jwt.sign({ _id: id }, getJWTSecretKey(), { expiresIn: '7d' });
-
-const sendTokenCookie = (res, newUser) => {
-  const { _id } = newUser;
+const sendTokenCookie = (res, user) => {
+  const { _id } = user;
   const token = createTokenById(_id);
   return res
     .cookie('token', token, {
@@ -19,7 +20,7 @@ const sendTokenCookie = (res, newUser) => {
       httpOnly: true,
       sameSite: true,
     })
-    .send(newUser);
+    .send(user);
 };
 
 const login = (req, res, next) => {
@@ -32,7 +33,7 @@ const login = (req, res, next) => {
 };
 
 const logout = (_, res) => {
-  res.clearCookie('token').send({ message: 'Вы вышли из профиля' });
+  res.clearCookie('token').send({ message: LOGOUT_MESSAGE });
 };
 
 const register = async (req, res, next) => {
@@ -40,11 +41,10 @@ const register = async (req, res, next) => {
   try {
     const hash = await bcrypt.hash(password, 10);
     const newUser = await User.create({ name, email, password: hash });
-    res.status(201);
-    sendTokenCookie(res, newUser);
+    res.status(201).send(newUser);
   } catch (err) {
     if (err.code === 11000) {
-      next(new ConflictError('Пользователь с данным email уже существует'));
+      next(new ConflictError(DOUBLE_EMAIL_MESSAGE));
     } else if (err.name === 'ValidationError') {
       next(new BadRequestError(err.message));
     } else {
@@ -60,23 +60,30 @@ const getOwnProfile = (req, res, next) => {
     .catch(next);
 };
 
-const updateOwnProfile = (req, res, next) => {
-  User.findByIdAndUpdate(
-    req.user._id,
-    { name: req.body.name },
-    {
-      new: true,
-      runValidators: true,
-    },
-  )
-    .then((user) => res.send(user))
-    .catch((err) => {
-      if (err.name === 'ValidationError') {
-        next(new BadRequestError(err.message));
-      } else {
-        next(err);
-      }
-    });
+const updateOwnProfile = async (req, res, next) => {
+  const { name, email } = req.body;
+  try {
+    const doubleUser = await User.findOne({ email });
+    // если _id не равны - значит попытка использовать email занятый другим пользователем
+    if (doubleUser?._id !== req.user._id) {
+      throw new ConflictError(DOUBLE_EMAIL_MESSAGE);
+    }
+    const updatedUser = await User.findByIdAndUpdate(
+      req.user._id,
+      { name, email },
+      {
+        new: true,
+        runValidators: true,
+      },
+    );
+    res.send(updatedUser);
+  } catch (err) {
+    if (err.name === 'ValidationError') {
+      next(new BadRequestError(err.message));
+    } else {
+      next(err);
+    }
+  }
 };
 
 module.exports = {

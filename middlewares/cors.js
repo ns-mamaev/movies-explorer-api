@@ -1,6 +1,4 @@
-require('dotenv').config();
-
-const { NODE_ENV, ALLOWED_CORS } = process.env;
+const { ALLOWED_CORS, NODE_ENV } = require('../server.config');
 
 const allowedCors = NODE_ENV === 'production'
   ? ALLOWED_CORS.split(';')
@@ -8,9 +6,6 @@ const allowedCors = NODE_ENV === 'production'
 
 const DEFAULT_ALLOWED_METHODS = 'GET,HEAD,PATCH,POST,DELETE';
 
-console.log(allowedCors);
-
-// eslint-disable-next-line consistent-return
 module.exports = (req, res, next) => {
   const { method } = req;
   const { origin } = req.headers;
@@ -29,5 +24,5 @@ module.exports = (req, res, next) => {
     res.header('Access-Control-Allow-Headers', requestHeaders);
     return res.end();
   }
-  next();
+  return next();
 };

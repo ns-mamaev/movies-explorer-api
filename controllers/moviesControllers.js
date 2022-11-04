@@ -2,47 +2,30 @@ const BadRequestError = require('../errors/badRequestError');
 const NotFoundError = require('../errors/notFoundError');
 const ForbiddenError = require('../errors/forbiddenError');
 const Movie = require('../models/movie');
+const {
+  DOUBLE_FILM_MESSAGE,
+  FILM_NOT_FOUND_MESSAGE,
+  INCORRECT_ID_MESSAGE,
+  SUCCESS_REMOVE_FILM_MESSAGE,
+  REMOVE_NOT_OWN_FILM_MESSAGE,
+} = require('../utills/constants');
 
-const getSavedMovies = (_, res, next) => {
-  Movie.find({})
+const getSavedMovies = (req, res, next) => {
+  Movie.find({ owner: req.user._id })
     .then((films) => res.send(films))
     .catch(next);
 };
 
 const createMovie = (req, res, next) => {
-  const {
-    country,
-    director,
-    duration,
-    year,
-    description,
-    image,
-    trailerLink,
-    nameRU,
-    nameEN,
-    thumbnail,
-    movieId,
-  } = req.body;
-
-  Movie.findOne({ movieId })
+  Movie.findOne({
+    movieId: req.body.movieId,
+    owner: req.user._id,
+  })
     .then((movie) => {
       if (movie) {
-        throw new ForbiddenError('Фильм с данным id уже добавлен в базу');
+        throw new ForbiddenError(DOUBLE_FILM_MESSAGE);
       }
-      return Movie.create({
-        country,
-        director,
-        duration,
-        year,
-        description,
-        image,
-        trailerLink,
-        nameRU,
-        nameEN,
-        thumbnail,
-        movieId,
-        owner: req.user._id,
-      })
+      return Movie.create({ ...req.body, owner: req.user._id })
         .then((newMovie) => res.status(201).send(newMovie));
     })
     .catch((err) => {
@@ -58,17 +41,17 @@ const removeMovieFromSaved = (req, res, next) => {
   Movie.findById(req.params.id)
     .then((movie) => {
       if (!movie) {
-        throw new NotFoundError('Фильм с таким id не найден');
+        throw new NotFoundError(FILM_NOT_FOUND_MESSAGE);
       }
       if (movie.owner.toString() !== req.user._id) {
-        throw new ForbiddenError('Нельзя удалять чужие фильмы');
+        throw new ForbiddenError(REMOVE_NOT_OWN_FILM_MESSAGE);
       }
       return movie.delete()
-        .then(() => res.send({ message: 'Фильм удалён' }));
+        .then(() => res.send({ message: SUCCESS_REMOVE_FILM_MESSAGE }));
     })
     .catch((err) => {
       if (err.name === 'CastError') {
-        next(new BadRequestError('Передан некорректный формат id'));
+        next(new BadRequestError(INCORRECT_ID_MESSAGE));
       } else {
         next(err);
       }

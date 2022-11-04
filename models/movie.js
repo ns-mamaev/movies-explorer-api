@@ -49,7 +49,7 @@ const movieSchema = new db.Schema({
   },
   movieId: {
     type: Number,
-    requiredd: true,
+    required: true,
   },
   nameRU: {
     type: String,

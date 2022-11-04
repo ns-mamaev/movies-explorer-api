@@ -1,10 +1,5 @@
-require('dotenv').config();
 const limitter = require('express-rate-limit');
-
-const {
-  REQUESTS_WINDOW_MS = 300000,
-  MAX_REQUESTS_NUMBER = 100,
-} = process.env;
+const { REQUESTS_WINDOW_MS, MAX_REQUESTS_NUMBER } = require('../server.config');
 
 module.exports = limitter({
   windowMs: REQUESTS_WINDOW_MS,

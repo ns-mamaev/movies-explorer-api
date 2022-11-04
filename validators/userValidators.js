@@ -11,18 +11,19 @@ const validateRegisterData = celebrate({
   body: Joi.object().keys({
     email: Joi.string().required().email(),
     password: Joi.string().required(),
-    name: Joi.string().min(2).max(30),
+    name: Joi.string().required().min(2).max(30),
   }),
 });
 
-const validateUserName = celebrate({
+const validateUserProfile = celebrate({
   body: Joi.object().keys({
-    name: Joi.string().min(2).max(30),
+    name: Joi.string().required().min(2).max(30),
+    email: Joi.string().required().email(),
   }),
 });
 
 module.exports = {
   validateLoginData,
   validateRegisterData,
-  validateUserName,
+  validateUserProfile,
 };
