@@ -10,9 +10,18 @@ const {
   REMOVE_NOT_OWN_FILM_MESSAGE,
 } = require('../utills/constants');
 
-const getSavedMovies = (req, res, next) => {
-  Movie.find({ owner: req.user._id })
-    .then((films) => res.send(films))
+const getMovies = (req, res, next) => {
+  const {
+    limit = 10,
+    page = 0,
+  } = req.query;
+  const offset = page * limit;
+  Movie.find()
+    .skip(offset)
+    .limit(limit)
+    .then((films) => res.send({
+      data: films,
+    }))
     .catch(next);
 };
 
@@ -59,7 +68,7 @@ const removeMovieFromSaved = (req, res, next) => {
 };
 
 module.exports = {
-  getSavedMovies,
+  getMovies,
   createMovie,
   removeMovieFromSaved,
 };

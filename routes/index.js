@@ -13,7 +13,7 @@ router.get('/crash', () => {
 router.post('/signin', validateLoginData, login);
 router.post('/signup', validateRegisterData, register);
 
-router.use(auth); // защита роутов авторизацией
+// router.use(auth); // защита роутов авторизацией
 
 router.use('/users', usersRouter);
 router.use('/movies', moviesRouter);

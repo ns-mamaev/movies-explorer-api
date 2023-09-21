@@ -2,7 +2,7 @@ require('dotenv').config();
 
 const {
   NODE_ENV,
-  PORT = 3000,
+  PORT = 4444,
   DB_PATH,
   REQUESTS_WINDOW_MS = 300000,
   MAX_REQUESTS_NUMBER = 100,

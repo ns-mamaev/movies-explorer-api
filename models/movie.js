@@ -42,11 +42,6 @@ const movieSchema = new db.Schema({
     required: true,
     validate: urlValidator,
   },
-  owner: {
-    type: db.Schema.Types.ObjectId,
-    ref: 'user',
-    required: true,
-  },
   movieId: {
     type: Number,
     required: true,
