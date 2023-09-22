@@ -1,7 +1,7 @@
 const BadRequestError = require('../errors/badRequestError');
 const NotFoundError = require('../errors/notFoundError');
 const ForbiddenError = require('../errors/forbiddenError');
-const Movie = require('../models/movie');
+const { Movie, Genre } = require('../models/movie');
 const {
   DOUBLE_FILM_MESSAGE,
   FILM_NOT_FOUND_MESSAGE,
@@ -22,6 +22,18 @@ const getMovies = (req, res, next) => {
     .then((films) => res.send({
       data: films,
     }))
+    .catch(next);
+};
+
+const getRandomMovie = (req, res, next) => {
+  Movie
+    .aggregate([
+      { $match: { ratingKP: { $gt: 7 } } },
+      { $sample: { size: 1 } },
+    ])
+    .then((result) => {
+      res.send({ data: result[0] });
+    })
     .catch(next);
 };
 
@@ -69,6 +81,7 @@ const removeMovieFromSaved = (req, res, next) => {
 
 module.exports = {
   getMovies,
+  getRandomMovie,
   createMovie,
   removeMovieFromSaved,
 };
