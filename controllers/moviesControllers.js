@@ -1,20 +1,24 @@
 const BadRequestError = require('../errors/badRequestError');
 const NotFoundError = require('../errors/notFoundError');
 const ForbiddenError = require('../errors/forbiddenError');
-const { Movie, Genre } = require('../models/movie');
+const Movie = require('../models/movie');
 const {
   DOUBLE_FILM_MESSAGE,
   FILM_NOT_FOUND_MESSAGE,
   INCORRECT_ID_MESSAGE,
   SUCCESS_REMOVE_FILM_MESSAGE,
   REMOVE_NOT_OWN_FILM_MESSAGE,
+  RUSSIAN_MOVIES_CONDITION,
+  MIN_MOOD_SCORE,
 } = require('../utills/constants');
+const Genre = require('../models/genre');
 
 const getMovies = (req, res, next) => {
   const {
     limit = 10,
     page = 0,
   } = req.query;
+
   const offset = page * limit;
   Movie.find()
     .skip(offset)
@@ -26,13 +30,51 @@ const getMovies = (req, res, next) => {
 };
 
 const getRandomMovie = (req, res, next) => {
+  const { query } = req;
+  const conditions = [];
+  // фильтр по стране
+  if (query.country) {
+    let operator = '$in';
+    if (query.country === 'foreign') {
+      operator = '$nin';
+    }
+    conditions.push({ country: { [operator]: RUSSIAN_MOVIES_CONDITION } });
+  }
+  // фильтр по дате
+  if (query.year) {
+    let startYear = 0;
+    if (query.year === 'new') {
+      startYear = new Date().getFullYear() - 1;
+    }
+    const matchLastRegexp = query.year.match(/last\d+/);
+    if (matchLastRegexp) {
+      startYear = new Date().getFullYear() - Number(query.year.replace('last', ''));
+    }
+    conditions.push({ year: { $gte: startYear } });
+  }
+  // фильтр по рейтингу
+  if (query.rating) {
+    if (query.rating === 'hight') {
+      conditions.push({ ratingKP: { $gte: 7.5 } });
+    }
+    if (query.rating === 'top250') {
+      conditions.push({ top250: { $ne: null } });
+    }
+  }
+  // отбор жанров по настроению
+  conditions.push({ [`mood.${query.mood}`]: { $gte: MIN_MOOD_SCORE } });
+
   Movie
     .aggregate([
-      { $match: { ratingKP: { $gt: 7 } } },
+      {
+        $match: {
+          $and: conditions,
+        },
+      },
       { $sample: { size: 1 } },
     ])
     .then((result) => {
-      res.send({ data: result[0] });
+      res.send({ data: result[0] || null });
     })
     .catch(next);
 };

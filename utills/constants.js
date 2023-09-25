@@ -12,3 +12,29 @@ module.exports.AUTH_REQUIRED_MESSAGE = 'Необходима авторизац�
 module.exports.INCORRECT_CREDENTIALS_MESSAGE = 'Неправильная почта или пароль';
 
 module.exports.INTERNAL_SERVER_ERROR_MESSAGE = 'Внутренняя ошибка сервера';
+
+module.exports.RUSSIAN_MOVIES_CONDITION = [/россия/i, /СССР/i];
+
+module.exports.GENRES = {
+  драма: { id: 8, mood: 'sad' },
+  комедия: { id: 6, mood: 'funny' },
+  биография: { id: 22, mood: 'basic' },
+  криминал: { id: 16, mood: 'tense' },
+  боевик: { id: 3, mood: 'amazed' },
+  триллер: { id: 4, mood: 'tense' },
+  семейный: { id: 11, mood: 'funny' },
+  фантастика: { id: 2, mood: 'amazed' },
+  приключения: { id: 10, mood: 'amazed' },
+  мультфильм: { id: 14, mood: 'funny' },
+  детектив: { id: 17, mood: 'tense' },
+  фэнтези: { id: 5, mood: 'amazed' },
+  мелодрама: { id: 7, mood: 'sad' },
+  история: { id: 23, mood: 'basic' },
+  военный: { id: 19, mood: 'tense' },
+  вестерн: { id: 13, mood: 'tense' },
+  музыка: { id: 21, mood: 'funny' },
+  мюзикл: { id: 9, mood: 'funny' },
+  спорт: { id: 24, mood: 'amazed' },
+};
+
+module.exports.MIN_MOOD_SCORE = 4;

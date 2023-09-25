@@ -57,26 +57,18 @@ const movieSchema = new db.Schema({
   ratingKP: {
     type: Number,
   },
+  top250: {
+    type: Number,
+  },
   votes: {
     type: Number,
   },
-});
-
-const genreSchema = new db.Schema({
-  id: {
-    type: Number,
-    required: true,
-  },
-  name: {
-    type: String,
-    required: true,
+  mood: {
+    type: Map,
+    of: Number,
   },
 });
 
 const Movie = db.model('movie', movieSchema);
-const Genre = db.model('genre', genreSchema);
 
-module.exports = {
-  Movie,
-  Genre,
-};
+module.exports = Movie;
