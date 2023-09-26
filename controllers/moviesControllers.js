@@ -29,6 +29,14 @@ const getMovies = (req, res, next) => {
     .catch(next);
 };
 
+const getMovie = (req, res, next) => {
+  Movie.findById(req.params.id)
+    .then((films) => res.send({
+      data: films,
+    }))
+    .catch(next);
+};
+
 const getRandomMovie = (req, res, next) => {
   const { query } = req;
   const conditions = [];
@@ -123,6 +131,7 @@ const removeMovieFromSaved = (req, res, next) => {
 
 module.exports = {
   getMovies,
+  getMovie,
   getRandomMovie,
   createMovie,
   removeMovieFromSaved,
