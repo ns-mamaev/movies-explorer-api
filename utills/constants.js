@@ -40,19 +40,19 @@ module.exports.GENRES = {
 module.exports.MIN_MOOD_SCORE = 4;
 
 module.exports.SORT_OPTIONS = {
-  titleAsk: 'nameRU',
-  titleDesk: '-nameRU',
-  ratingAsk: 'ratingKP',
-  ratingDesk: '-ratingKP',
-  yearAsk: 'year',
-  yearDesk: '-year',
+  titleAsk: { nameRU: 1 },
+  titleDesk: { nameRU: -1 },
+  ratingAsk: { ratingKP: 1 },
+  ratingDesk: { ratingKP: -1 },
+  yearAsk: { year: 1 },
+  yearDesk: { year: -1 },
 };
 
 module.exports.RAITING_OPTIONS = {
-  top250: ['top250', { $ne: null }],
-  gte8: ['ratingKP', { $gte: 8 }],
-  gte7: ['ratingKP', { $gte: 7 }],
-  gte6: ['ratingKP', { $gte: 6 }],
+  top250: { top250: { $ne: null } },
+  gte8: { ratingKP: { $gte: 8 } },
+  gte7: { ratingKP: { $gte: 7 } },
+  gte6: { ratingKP: { $gte: 6 } },
 };
 
 module.exports.YEAR_OPTIONS = {

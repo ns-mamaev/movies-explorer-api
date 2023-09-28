@@ -14,57 +14,85 @@ const {
   RAITING_OPTIONS,
   YEAR_OPTIONS,
 } = require('../utills/constants');
-const Genre = require('../models/genre');
 
 const getMovies = (req, res, next) => {
   const {
-    limit = 10,
-    page = 0,
     sortType,
     rating,
     years,
     genres,
+    search,
   } = req.query;
+
+  const offset = Number(req.query.offset || 0);
+  const limit = Number(req.query.limit || 12);
 
   const sortArg = SORT_OPTIONS[sortType] || SORT_OPTIONS.yearDesk;
 
-  const whereConditions = {};
+  const whereConditions = [];
+
+  if (search) {
+    whereConditions.push({ nameRU: new RegExp(`${search}`, 'i')});
+  }
 
   if (rating && Object.hasOwn(RAITING_OPTIONS, rating)) {
-    const [key, condition] = RAITING_OPTIONS[rating];
-    whereConditions[key] = condition;
+    whereConditions.push(RAITING_OPTIONS[rating]);
   }
 
   if (genres) {
-    const genresList = genres.split(';');
-    whereConditions.genres = { $elemMatch: { $in: genresList } };
+    const genresList = genres.split(';').map((v) => Number(v));
+    whereConditions.push({ genres: { $elemMatch: { $in: genresList } } });
   }
 
   if (years) {
     const yearsList = years.split(';');
-    const yearsConditions = [];
-    yearsList.forEach((option) => {
-      const condition = YEAR_OPTIONS[option];
-      if (condition) {
-        yearsConditions.push(condition);
-      }
-    });
-    if (yearsConditions.length === 1) {
-      const [key, condition] = Object.entries(yearsConditions[0])[0];
-      whereConditions[key] = condition;
+    if (yearsList.length === 1) {
+      whereConditions.push(YEAR_OPTIONS[yearsList[0]]);
     } else {
-      whereConditions.$or = yearsConditions;
+      const yearsConditions = [];
+      yearsList.forEach((option) => {
+        const condition = YEAR_OPTIONS[option];
+        if (condition) {
+          yearsConditions.push(condition);
+        }
+      });
+      whereConditions.push({ $or: yearsConditions });
     }
   }
 
-  const offset = page * limit;
-  Movie.find(whereConditions)
-    .sort(sortArg)
-    .skip(offset)
-    .limit(limit)
-    .then((films) => res.send({
-      data: films,
-    }))
+  const pipeline = [
+    {
+      $match: whereConditions.length ? { $and: whereConditions } : {},
+    },
+    {
+      $facet: {
+        totalCount: [
+          { $group: { _id: null, count: { $sum: 1 } } },
+        ],
+        documents: [
+          { $sort: sortArg },
+          { $skip: offset },
+          { $limit: limit },
+        ],
+      },
+    },
+  ];
+
+  Movie.aggregate(pipeline)
+    .then((result) => {
+      const { totalCount, documents } = result[0];
+      if (!totalCount[0]) {
+        return res.send({ data: null });
+      }
+      const { count } = totalCount[0];
+      return res.send({
+        data: {
+          totalCount: count,
+          offset: Math.min(offset + limit),
+          movies: documents,
+        },
+      });
+    })
     .catch(next);
 };
 
