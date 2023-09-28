@@ -10,6 +10,9 @@ const {
   REMOVE_NOT_OWN_FILM_MESSAGE,
   RUSSIAN_MOVIES_CONDITION,
   MIN_MOOD_SCORE,
+  SORT_OPTIONS,
+  RAITING_OPTIONS,
+  YEAR_OPTIONS,
 } = require('../utills/constants');
 const Genre = require('../models/genre');
 
@@ -17,10 +20,46 @@ const getMovies = (req, res, next) => {
   const {
     limit = 10,
     page = 0,
+    sortType,
+    rating,
+    years,
+    genres,
   } = req.query;
 
+  const sortArg = SORT_OPTIONS[sortType] || SORT_OPTIONS.yearDesk;
+
+  const whereConditions = {};
+
+  if (rating && Object.hasOwn(RAITING_OPTIONS, rating)) {
+    const [key, condition] = RAITING_OPTIONS[rating];
+    whereConditions[key] = condition;
+  }
+
+  if (genres) {
+    const genresList = genres.split(';');
+    whereConditions.genres = { $elemMatch: { $in: genresList } };
+  }
+
+  if (years) {
+    const yearsList = years.split(';');
+    const yearsConditions = [];
+    yearsList.forEach((option) => {
+      const condition = YEAR_OPTIONS[option];
+      if (condition) {
+        yearsConditions.push(condition);
+      }
+    });
+    if (yearsConditions.length === 1) {
+      const [key, condition] = Object.entries(yearsConditions[0])[0];
+      whereConditions[key] = condition;
+    } else {
+      whereConditions.$or = yearsConditions;
+    }
+  }
+
   const offset = page * limit;
-  Movie.find()
+  Movie.find(whereConditions)
+    .sort(sortArg)
     .skip(offset)
     .limit(limit)
     .then((films) => res.send({

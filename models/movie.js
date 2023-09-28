@@ -20,7 +20,7 @@ const movieSchema = new db.Schema({
     required: true,
   },
   year: {
-    type: String,
+    type: Number,
     required: true,
   },
   description: {
@@ -54,19 +54,14 @@ const movieSchema = new db.Schema({
     type: String,
     required: true,
   },
-  ratingKP: {
-    type: Number,
-  },
-  top250: {
-    type: Number,
-  },
-  votes: {
-    type: Number,
-  },
+  ratingKP: Number,
+  top250: Number,
+  votes: Number,
   mood: {
     type: Map,
     of: Number,
   },
+  genres: [Number],
 });
 
 const Movie = db.model('movie', movieSchema);

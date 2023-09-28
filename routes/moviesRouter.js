@@ -9,8 +9,8 @@ const {
 const { validateMovieData, validateMovieId } = require('../validators/moviesValidators');
 
 router.get('/', getMovies);
-router.get('/:id', getMovie);
 router.get('/random', getRandomMovie);
+router.get('/:id', getMovie);
 router.post('/', validateMovieData, createMovie);
 router.delete('/:id', validateMovieId, removeMovieFromSaved);
 

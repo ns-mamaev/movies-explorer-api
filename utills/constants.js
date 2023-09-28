@@ -38,3 +38,28 @@ module.exports.GENRES = {
 };
 
 module.exports.MIN_MOOD_SCORE = 4;
+
+module.exports.SORT_OPTIONS = {
+  titleAsk: 'nameRU',
+  titleDesk: '-nameRU',
+  ratingAsk: 'ratingKP',
+  ratingDesk: '-ratingKP',
+  yearAsk: 'year',
+  yearDesk: '-year',
+};
+
+module.exports.RAITING_OPTIONS = {
+  top250: ['top250', { $ne: null }],
+  gte8: ['ratingKP', { $gte: 8 }],
+  gte7: ['ratingKP', { $gte: 7 }],
+  gte6: ['ratingKP', { $gte: 6 }],
+};
+
+module.exports.YEAR_OPTIONS = {
+  current: { year: new Date().getFullYear() },
+  last: { year: new Date().getFullYear() - 1 },
+  from2020: { $and: [{ year: { $gte: 2020 } }, { year: { $lt: new Date().getFullYear() - 1 } }] },
+  from2010: { $and: [{ year: { $gte: 2010 } }, { year: { $lt: 2020 } }] },
+  from2000: { $and: [{ year: { $gte: 2000 } }, { year: { $lt: 2010 } }] },
+  less2000: { year: { $lt: 2000 } },
+};
