@@ -39,13 +39,15 @@ module.exports.GENRES = {
 
 module.exports.MIN_MOOD_SCORE = 4;
 
+// (!) обязательно в каждой сортировке должны быть уникальные поля (название или id),
+// иначе сортировка не будет детерминированной и возможны дубли при пагинации
 module.exports.SORT_OPTIONS = {
   titleAsk: { nameRU: 1 },
   titleDesk: { nameRU: -1 },
-  ratingAsk: { ratingKP: 1 },
-  ratingDesk: { ratingKP: -1 },
-  yearAsk: { year: 1 },
-  yearDesk: { year: -1 },
+  ratingAsk: { ratingKP: 1, nameRU: 1 },
+  ratingDesk: { ratingKP: -1, nameRU: 1 },
+  yearAsk: { year: 1, nameRU: 1 },
+  yearDesk: { year: -1, nameRU: 1 },
 };
 
 module.exports.RAITING_OPTIONS = {
