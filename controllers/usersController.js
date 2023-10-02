@@ -20,7 +20,7 @@ const sendTokenCookie = (res, user) => {
       httpOnly: true,
       sameSite: true,
     })
-    .send(user);
+    .send({ data: user });
 };
 
 const login = (req, res, next) => {
@@ -56,7 +56,9 @@ const register = async (req, res, next) => {
 const getOwnProfile = (req, res, next) => {
   const { _id } = req.user;
   User.findById(_id)
-    .then((user) => res.send(user))
+    .then((user) => {
+      sendTokenCookie(res, user);
+    })
     .catch(next);
 };
 

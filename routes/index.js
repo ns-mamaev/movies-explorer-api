@@ -4,7 +4,6 @@ const NotFoundError = require('../errors/notFoundError');
 const moviesRouter = require('./moviesRouter');
 const genresRouter = require('./genresRouter');
 const usersRouter = require('./usersRouter');
-const auth = require('../middlewares/auth');
 const { validateLoginData, validateRegisterData } = require('../validators/userValidators');
 
 router.get('/crash', () => {
@@ -13,11 +12,8 @@ router.get('/crash', () => {
 
 router.post('/signin', validateLoginData, login);
 router.post('/signup', validateRegisterData, register);
-
-// router.use(auth); // защита роутов авторизацией
-
-router.use('/users', usersRouter);
 router.use('/movies', moviesRouter);
+router.use('/users', usersRouter);
 router.use('/genres', genresRouter);
 router.get('/signout', logout);
 
