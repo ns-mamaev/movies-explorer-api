@@ -1,3 +1,4 @@
+const { ObjectId } = require('mongoose').Types;
 const BadRequestError = require('../errors/badRequestError');
 const NotFoundError = require('../errors/notFoundError');
 const ForbiddenError = require('../errors/forbiddenError');
@@ -155,17 +156,36 @@ const getRandomMovie = (req, res, next) => {
     .catch(next);
 };
 
+const getSavedMovies = (req, res, next) => {
+  SavedMovie
+    // .find({ owner: req.user._id })
+    .aggregate([
+      { $match: { owner: ObjectId(req.user._id) } },
+      {
+        $lookup: {
+          from: 'movies',
+          localField: 'movieId',
+          foreignField: '_id',
+          as: 'movieData',
+        },
+      },
+      { $unwind: '$movieData' },
+    ])
+    .then((result) => res.send({ data: result }))
+    .catch(next);
+};
+
 const saveMovie = (req, res, next) => {
   // TODO придумать как решить задачу одним запросом
   SavedMovie.findOne({
-    movieId: req.body._id,
+    movieId: req.params.id,
     owner: req.user._id,
   })
     .then((movie) => {
       if (movie) {
         throw new ForbiddenError(DOUBLE_FILM_MESSAGE);
       }
-      return SavedMovie.create({ movieId: req.body._id, owner: req.user._id })
+      return SavedMovie.create({ movieId: req.params.id, owner: req.user._id })
         .then((newMovie) => res.status(201).send(newMovie));
     })
     .catch((err) => {
@@ -178,7 +198,10 @@ const saveMovie = (req, res, next) => {
 };
 
 const removeMovieFromSaved = (req, res, next) => {
-  Movie.findById(req.params.id)
+  SavedMovie.findOne({
+    movieId: req.body._id,
+    owner: req.user._id,
+  })
     .then((movie) => {
       if (!movie) {
         throw new NotFoundError(FILM_NOT_FOUND_MESSAGE);
@@ -202,6 +225,7 @@ module.exports = {
   getMovies,
   getMovie,
   getRandomMovie,
+  getSavedMovies,
   saveMovie,
   removeMovieFromSaved,
 };

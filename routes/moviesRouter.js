@@ -6,14 +6,14 @@ const {
   getRandomMovie,
   getMovie,
   saveMovie,
+  getSavedMovies,
 } = require('../controllers/moviesControllers');
-const { validateMovieData, validateMovieId } = require('../validators/moviesValidators');
 
 router.get('/', getMovies);
 router.get('/random', getRandomMovie);
+router.get('/saved', authMiddleware, getSavedMovies);
 router.get('/:id', getMovie);
-router.use(authMiddleware);
-router.post('/', saveMovie);
-router.delete('/:id', validateMovieId, removeMovieFromSaved);
+router.post('/:id/likes', authMiddleware, saveMovie);
+router.delete('/:id', authMiddleware, removeMovieFromSaved);
 
 module.exports = router;
