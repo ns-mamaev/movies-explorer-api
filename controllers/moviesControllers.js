@@ -2,6 +2,7 @@ const BadRequestError = require('../errors/badRequestError');
 const NotFoundError = require('../errors/notFoundError');
 const ForbiddenError = require('../errors/forbiddenError');
 const Movie = require('../models/movie');
+const SavedMovie = require('../models/savedMovie');
 const {
   DOUBLE_FILM_MESSAGE,
   FILM_NOT_FOUND_MESSAGE,
@@ -154,16 +155,17 @@ const getRandomMovie = (req, res, next) => {
     .catch(next);
 };
 
-const createMovie = (req, res, next) => {
-  Movie.findOne({
-    movieId: req.body.movieId,
+const saveMovie = (req, res, next) => {
+  // TODO придумать как решить задачу одним запросом
+  SavedMovie.findOne({
+    movieId: req.body._id,
     owner: req.user._id,
   })
     .then((movie) => {
       if (movie) {
         throw new ForbiddenError(DOUBLE_FILM_MESSAGE);
       }
-      return Movie.create({ ...req.body, owner: req.user._id })
+      return SavedMovie.create({ movieId: req.body._id, owner: req.user._id })
         .then((newMovie) => res.status(201).send(newMovie));
     })
     .catch((err) => {
@@ -200,6 +202,6 @@ module.exports = {
   getMovies,
   getMovie,
   getRandomMovie,
-  createMovie,
+  saveMovie,
   removeMovieFromSaved,
 };
