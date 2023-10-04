@@ -75,6 +75,15 @@ const getMovies = (req, res, next) => {
           { $sort: sortArg },
           { $skip: offset },
           { $limit: limit },
+          {
+            $lookup: {
+              from: 'saved-movies',
+              localField: '_id',
+              foreignField: 'movieId',
+              pipeline: [{ $match: { owner: ObjectId(req.user?._id) } }],
+              as: 'savedData',
+            },
+          },
         ],
       },
     },

@@ -1,5 +1,5 @@
 const router = require('express').Router();
-const authMiddleware = require('../middlewares/auth');
+const authCheck = require('../middlewares/authCheck');
 const {
   getMovies,
   removeMovieFromSaved,
@@ -11,9 +11,9 @@ const {
 
 router.get('/', getMovies);
 router.get('/random', getRandomMovie);
-router.get('/saved', authMiddleware, getSavedMovies);
+router.get('/saved', authCheck, getSavedMovies);
 router.get('/:id', getMovie);
-router.post('/:id/likes', authMiddleware, saveMovie);
-router.delete('/:id', authMiddleware, removeMovieFromSaved);
+router.post('/:id/likes', authCheck, saveMovie);
+router.delete('/:id', authCheck, removeMovieFromSaved);
 
 module.exports = router;

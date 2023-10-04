@@ -8,6 +8,7 @@ const {
   DOUBLE_EMAIL_MESSAGE,
 } = require('../utills/constants');
 const { COOKIE_MAX_AGE, JWT_SECRET } = require('../server.config');
+const UnauthorizedError = require('../errors/unauthorizedError');
 
 const createTokenById = (id) => jwt.sign({ _id: id }, JWT_SECRET, { expiresIn: '7d' });
 
@@ -54,6 +55,9 @@ const register = async (req, res, next) => {
 };
 
 const getOwnProfile = (req, res, next) => {
+  if (!req.user) {
+    return next(new UnauthorizedError('Вход не выполнен'));
+  }
   const { _id } = req.user;
   User.findById(_id)
     .then((user) => {
