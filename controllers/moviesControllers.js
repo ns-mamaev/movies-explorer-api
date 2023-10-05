@@ -17,6 +17,33 @@ const {
   YEAR_OPTIONS,
 } = require('../utills/constants');
 
+const getLookupSavedMoviesStage = (userId) => {
+  if (!userId) {
+    return [];
+  }
+  return [
+    {
+      $lookup: {
+        from: 'saved-movies',
+        localField: '_id',
+        foreignField: 'movieId',
+        pipeline: [{ $match: { owner: ObjectId(userId) } }],
+        as: 'savedData',
+      },
+    },
+    {
+      $addFields: {
+        isLiked: { $cond: { if: { $gt: [{ $size: '$savedData' }, 0] }, then: true, else: false } },
+      },
+    },
+    {
+      $project: {
+        savedData: 0,
+      },
+    },
+  ];
+};
+
 const getMovies = (req, res, next) => {
   const {
     sortType,
@@ -75,15 +102,7 @@ const getMovies = (req, res, next) => {
           { $sort: sortArg },
           { $skip: offset },
           { $limit: limit },
-          {
-            $lookup: {
-              from: 'saved-movies',
-              localField: '_id',
-              foreignField: 'movieId',
-              pipeline: [{ $match: { owner: ObjectId(req.user?._id) } }],
-              as: 'savedData',
-            },
-          },
+          ...getLookupSavedMoviesStage(req.user._id),
         ],
       },
     },
@@ -108,10 +127,16 @@ const getMovies = (req, res, next) => {
 };
 
 const getMovie = (req, res, next) => {
-  Movie.findById(req.params.id)
-    .then((films) => res.send({
-      data: films,
-    }))
+  Movie.aggregate([
+    { $match: { _id: ObjectId(req.params.id) } },
+    ...getLookupSavedMoviesStage(req.user._id),
+  ])
+    .then((result) => {
+      if (!result.length) {
+        return res.send({ data: null });
+      }
+      return res.send({ data: result[0] });
+    })
     .catch(next);
 };
 
@@ -158,6 +183,7 @@ const getRandomMovie = (req, res, next) => {
         },
       },
       { $sample: { size: 1 } },
+      ...getLookupSavedMoviesStage(req.user._id),
     ])
     .then((result) => {
       res.send({ data: result[0] || null });
@@ -195,7 +221,7 @@ const saveMovie = (req, res, next) => {
         throw new ForbiddenError(DOUBLE_FILM_MESSAGE);
       }
       return SavedMovie.create({ movieId: req.params.id, owner: req.user._id })
-        .then((newMovie) => res.status(201).send(newMovie));
+        .then((newMovie) => res.status(201).send({ data: newMovie }));
     })
     .catch((err) => {
       if (err.name === 'ValidationError') {
@@ -208,7 +234,7 @@ const saveMovie = (req, res, next) => {
 
 const removeMovieFromSaved = (req, res, next) => {
   SavedMovie.findOne({
-    movieId: req.body._id,
+    movieId: req.params.id,
     owner: req.user._id,
   })
     .then((movie) => {

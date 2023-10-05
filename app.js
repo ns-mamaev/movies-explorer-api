@@ -19,11 +19,11 @@ db.connect(DB_PATH, { family: 4 }, (err) => {
   console.log('==== DB connect success =======');
 });
 // app.use(requestLogger);
+app.use(cors);
 app.use(limitter);
 app.use(express.json());
 app.use(cookieParser());
 app.use(helmet());
-app.use(cors);
 app.use(router);
 
 // app.use(errorLogger);

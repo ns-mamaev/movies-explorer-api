@@ -14,6 +14,6 @@ router.get('/random', getRandomMovie);
 router.get('/saved', authCheck, getSavedMovies);
 router.get('/:id', getMovie);
 router.post('/:id/likes', authCheck, saveMovie);
-router.delete('/:id', authCheck, removeMovieFromSaved);
+router.delete('/:id/likes', authCheck, removeMovieFromSaved);
 
 module.exports = router;
