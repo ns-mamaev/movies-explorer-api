@@ -1,11 +1,6 @@
 # movies-explorer-api
 
-Бэкенд часть дипломного проекта movies search.
-Ссылка на репозиторий: https://github.com/ns-mamaev/movies-explorer-api
-
-IP 84.201.137.14
-
-адрес: https://api.moviessearch.nomoredomains.icu
+Бэкенд часть [проекта Movies-explorer](https://github.com/ns-mamaev/movies-explorer-frontend)
 
 ## Используемые технологии
 * Node.JS
