@@ -1,0 +1,22 @@
+[
+  { "id": 8, "name": "драма", "mood": "sad"},
+  { "id": 6, "name": "комедия", "mood": "funny"},
+  { "id": 22, "name": "биография", "mood": "basic"},
+  { "id": 16, "name": "криминал", "mood": "tense"},
+  { "id": 3, "name": "боевик", "mood": "amazed"},
+  { "id": 4, "name": "триллер", "mood": "tense"},
+  { "id": 11, "name": "семейный", "mood": "funny"},
+  { "id": 2, "name": "фантастика", "mood": "amazed"},
+  { "id": 10, "name": "приключения", "mood": "amazed"},
+  { "id": 14, "name": "мультфильм", "mood": "funny"},
+  { "id": 17, "name": "детектив", "mood": "tense"},
+  { "id": 5, "name": "фэнтези", "mood": "amazed"},
+  { "id": 7, "name": "мелодрама", "mood": "sad"},
+  { "id": 23, "name": "история", "mood": "basic"},
+  { "id": 19, "name": "военный", "mood": "tense"},
+  { "id": 13, "name": "вестерн", "mood": "tense"},
+  { "id": 21, "name": "музыка", "mood": "funny"},
+  { "id": 9, "name": "мюзикл", "mood": "funny"},
+  { "id": 24, "name": "спорт", "mood": "amazed"}
+]
+

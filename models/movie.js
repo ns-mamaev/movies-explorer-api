@@ -20,7 +20,7 @@ const movieSchema = new db.Schema({
     required: true,
   },
   year: {
-    type: String,
+    type: Number,
     required: true,
   },
   description: {
@@ -42,11 +42,6 @@ const movieSchema = new db.Schema({
     required: true,
     validate: urlValidator,
   },
-  owner: {
-    type: db.Schema.Types.ObjectId,
-    ref: 'user',
-    required: true,
-  },
   movieId: {
     type: Number,
     required: true,
@@ -59,6 +54,16 @@ const movieSchema = new db.Schema({
     type: String,
     required: true,
   },
+  ratingKP: Number,
+  top250: Number,
+  votes: Number,
+  mood: {
+    type: Map,
+    of: Number,
+  },
+  genres: [Number],
 });
 
-module.exports = db.model('movie', movieSchema);
+const Movie = db.model('movie', movieSchema);
+
+module.exports = Movie;

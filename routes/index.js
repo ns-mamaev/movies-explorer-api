@@ -2,8 +2,9 @@ const router = require('express').Router();
 const { login, register, logout } = require('../controllers/usersController');
 const NotFoundError = require('../errors/notFoundError');
 const moviesRouter = require('./moviesRouter');
+const genresRouter = require('./genresRouter');
 const usersRouter = require('./usersRouter');
-const auth = require('../middlewares/auth');
+const authMiddleware = require('../middlewares/authMiddleware');
 const { validateLoginData, validateRegisterData } = require('../validators/userValidators');
 
 router.get('/crash', () => {
@@ -12,12 +13,12 @@ router.get('/crash', () => {
 
 router.post('/signin', validateLoginData, login);
 router.post('/signup', validateRegisterData, register);
-
-router.use(auth); // защита роутов авторизацией
-
-router.use('/users', usersRouter);
-router.use('/movies', moviesRouter);
+// роуты ниже работают с req.user, который добавляет эта миддлвара
+router.use(authMiddleware);
 router.get('/signout', logout);
+router.use('/movies', moviesRouter);
+router.use('/users', usersRouter);
+router.use('/genres', genresRouter);
 
 router.use(() => {
   throw new NotFoundError('Ресурс не найден. Проверьте URL и метод запроса');

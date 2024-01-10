@@ -6,15 +6,13 @@ const { AUTH_REQUIRED_MESSAGE } = require('../utills/constants');
 module.exports = (req, _, next) => {
   const { token } = req.cookies;
   if (!token) {
-    throw new UnauthorizedError(AUTH_REQUIRED_MESSAGE);
+    return next();
   }
-  let payload;
   try {
-    const secretKey = JWT_SECRET;
-    payload = jwt.verify(token, secretKey);
+    const payload = jwt.verify(token, JWT_SECRET);
+    req.user = payload;
   } catch (err) {
-    throw new UnauthorizedError(AUTH_REQUIRED_MESSAGE);
+    next(new UnauthorizedError(AUTH_REQUIRED_MESSAGE));
   }
-  req.user = payload;
-  next();
+  return next();
 };
